@@ -39,7 +39,7 @@ type t
 val empty : t
 
 val add : key -> t -> unit
-val find : key -> t -> key option
+val find : key -> t -> key Js.Undefined.t
 
 val next_key : key -> t -> key Js.Undefined.t
 val prev_key : key -> t -> key Js.Undefined.t

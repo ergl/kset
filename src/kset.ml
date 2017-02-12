@@ -175,7 +175,9 @@ let wrap fn = try Some (fn ()) with Not_found -> None
 
 let add elt t = t := (Storage.add elt !t)
 
-let find x t = wrap @@ fun () -> Storage.find x !t
+let find_opt x t = wrap @@ fun () -> Storage.find x !t
+
+let find x t = Js.Undefined.from_opt @@ find_opt x t
 
 let next_key_opt elt t = match Storage.split elt !t with
   | (_, false, _) -> None
@@ -222,7 +224,7 @@ let collect_while ini fn t =
         | false -> collect acc None
       end
   in
-  match find ini t with 
+  match find_opt ini t with
   | None -> []
   | Some s -> List.rev @@ collect [s] (next_key_opt s t)
 
