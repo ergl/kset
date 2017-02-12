@@ -25,7 +25,6 @@ type key =
   | KUIndex of string * key
   | KUIndexField of string * key
   | KUIndexFieldValue of data
-  (*[@@deriving show]*)
 
 let table ~tname:t =
   KTable (t, Bottom)
@@ -156,7 +155,6 @@ let rec key_compare left right = match left, right with
   | _, Bottom -> Gt
 
   | _, _ -> failwith "Wrong pair"
-(*| _, _ -> failwith @@ "Wrong pair: " ^ (show_key left) ^ ", " ^ (show_key right)*)
 
 and compare_same_level : type a. (a * key) -> (a * key) -> com_range =
   fun (l, lch) (r, rch) ->
