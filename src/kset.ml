@@ -57,7 +57,7 @@ let uindex_prefix = "UINDEX"
 let concat (x::xs) =
   List.fold_left (fun s p -> s ^ prefix_separator_str ^ p) x xs
 
-let encoding : string -> string = Encoding.d_string
+let encoding = Encoding.d_string
 
 let dencoding data = encoding @@ match data with
   | I x -> Encoding.d_int x
@@ -74,7 +74,7 @@ let create_complex_key nl =
       end
   in c' `First "" nl
 
-let append_complex_key : int -> string list -> string list = fun n (x::xs) ->
+let append_complex_key n (x::xs) =
   (x ^ (string_of_int n |> encoding)) :: xs
 
 let rec repr' (key : key) (acc : string list) : string list = match key with
