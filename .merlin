@@ -1,0 +1,14 @@
+S src/**
+S test/**
+B _build/src/**
+B _build/test/**
+PKG qcheck base64
+
+####{BSB GENERATED: NO EDIT
+S /usr/local/lib/node_modules/bs-platform/bin/../lib/ocaml
+B /usr/local/lib/node_modules/bs-platform/bin/../lib/ocaml
+FLG -ppx /usr/local/lib/node_modules/bs-platform/bin/bsppx.exe
+
+S src
+B lib/bs/src
+####BSB GENERATED: NO EDIT}
