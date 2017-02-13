@@ -8,22 +8,59 @@ let d_float f = F f
 let d_string s = S s
 
 type key =
+  (* Bottom value.
+     Holds no semantic value, but caps super keys. *)
   | Bottom
 
+  (* Table key.
+     Points to table metadata, containing schema, foreign key information, etc *)
   | KTable of string * key
 
+  (* Simple primary key.
+     Used as a sentinel key, but doesn't point to any data. Used for subkey
+     ranges and as marker for tables with NULL values. *)
   | KSPk of data * key
+
+  (* Complex primary key.
+     Used as a sentinel key, but doesn't point to any data. Used for subkey
+     ranges and as marker for tables with NULL values. *)
   | KCPk of data list * key
 
+  (* Field key.
+     Points to the contents of this field in this table. *)
   | KField of string
 
+  (* Top level index key.
+     Holds no semantic value, but is inserted to allow subkey scans. *)
   | KIndex of string * key
+
+  (* Field level index key.
+     Holds no semantic value, but represents an indexed field name,
+     and is inserted to allow subkey scans. *)
   | KIndexField of string * key
+
+  (* Field value index key.
+     This key stores the actual value of the indexed field,
+     embedded into the key structure. *)
   | KIndexFieldValue of data * key
+
+  (* Field key index key.
+     This key stores the primary key of the indexed field with a value. *)
   | KIndexFieldKey of data
 
+  (* Top level unique index key.
+     Holds no semantic value, but is inserted to allow subkey scans. *)
   | KUIndex of string * key
+
+  (* Field level unique index key.
+     Holds no semantic value, but represents an indexed field name,
+     and is inserted to allow subkey scans. *)
   | KUIndexField of string * key
+
+  (* Field value unique index key.
+     This key stores the actual value of the indexed field,
+     embedded into the key structure. Points to its corresponding primary key.
+     A conditional put must be used to check for uniqueness. *)
   | KUIndexFieldValue of data
 
 let table ~tname:t =
