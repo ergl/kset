@@ -38,8 +38,23 @@ let cpk ~tname:t ~value:nl =
 let field ~tname:t ~value:n ~fname:name =
   KTable (t, KSPk (n, KField name))
 
+let raw_index ~tname:t ~iname:i =
+  KTable (t, KIndex (i, Bottom))
+
+let raw_index_field ~tname:t ~iname:i ~fname:f =
+  KTable (t, KIndex (i, KIndexField (f, Bottom)))
+
+let raw_index_field_value ~tname:t ~iname:i ~fname:f ~fvalue:v =
+  KTable (t, KIndex (i, KIndexField (f, KIndexFieldValue (v, Bottom))))
+
 let index_key ~tname:t ~iname:i ~fname:f ~fvalue:v ~fkey:k =
   KTable (t, KIndex (i, KIndexField (f, KIndexFieldValue (v, KIndexFieldKey k))))
+
+let raw_uindex ~tname:t ~iname:i =
+  KTable (t, KUIndex (i, Bottom))
+
+let raw_uindex_field ~tname:t ~iname:i ~fname:f =
+  KTable (t, KUIndex (i, KUIndexField (f, Bottom)))
 
 let uindex_key ~tname:t ~iname:i ~fname:f ~fvalue:v =
   KTable (t, KUIndex (i, KUIndexField (f, KUIndexFieldValue v)))

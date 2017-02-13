@@ -17,12 +17,34 @@ val spk : tname:string -> value:data -> key
 (* Create a fiel key *)
 val field : tname:string -> value:data -> fname:string -> key
 
+(* Create a raw index key. Used only for batches and subkeys *)
+val raw_index : tname:string -> iname:string -> key
+
+(* Create a raw index field name key. Used only for batches and subkeys *)
+val raw_index_field : tname:string
+  -> iname:string
+  -> fname:string
+  -> key
+
+(* Create a raw index field value key. Used only for batches and subkeys *)
+val raw_index_field_value : tname:string
+  -> iname:string
+  -> fname:string
+  -> fvalue:data
+  -> key
+
 (* An index key *)
 val index_key : tname:string 
   -> iname:string
   -> fname:string
   -> fvalue:data
   -> fkey:data
+  -> key
+
+(* Create a raw index field name key. Used only for batches and subkeys *)
+val raw_uindex_field : tname:string
+  -> iname:string
+  -> fname:string
   -> key
 
 (* An unique index key *)
