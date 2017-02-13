@@ -164,44 +164,59 @@ let v_compare x y = match Pervasives.compare x y with
   | n -> if n < 0 then Lt else Gt
 
 let rec key_compare left right = match left, right with
-  | Bottom, Bottom -> Eq
+  | Bottom,
+    Bottom -> Eq
 
-  | KSPk (l, lch), KSPk (r, rch) -> compare_same_level (l, lch) (r, rch)
-  | KCPk (l, lch), KCPk (r, rch) -> compare_same_level (l, lch) (r, rch)
+  | KSPk (l, lch),
+    KSPk (r, rch) -> compare_same_level (l, lch) (r, rch)
 
-  | KTable (l, lch), KTable (r, rch) |
-    KIndex (l, lch), KIndex (r, rch) |
-    KIndexField (l, lch), KIndexField (r, rch) |
-    KUIndex (l, lch), KUIndex (r, rch) |
-    KUIndexField (l, lch), KUIndexField (r, rch) -> compare_same_level (l, lch) (r, rch)
+  | KCPk (l, lch),
+    KCPk (r, rch) -> compare_same_level (l, lch) (r, rch)
 
-  | KIndexFieldValue (l, lch), KIndexFieldValue (r, rch) -> compare_same_level (l, lch) (r, rch)
+  | KTable (l, lch),
+    KTable (r, rch)
+  | KIndex (l, lch),
+    KIndex (r, rch)
+  | KIndexField (l, lch),
+    KIndexField (r, rch)
+  | KUIndex (l, lch),
+    KUIndex (r, rch)
+  | KUIndexField (l, lch),
+    KUIndexField (r, rch) -> compare_same_level (l, lch) (r, rch)
 
-  | KField l, KField r -> v_compare l r
-  | KIndexFieldKey l, KIndexFieldKey r -> v_compare l r
-  | KUIndexFieldValue l, KUIndexFieldValue r -> v_compare l r
+  | KIndexFieldValue (l, lch),
+    KIndexFieldValue (r, rch) -> compare_same_level (l, lch) (r, rch)
 
-  | KSPk _, KIndex _ |
-    KSPk _, KUIndex _ |
-    KIndex _, KUIndex _ -> Lt
+  | KField l,
+    KField r -> v_compare l r
 
-  | KIndex _, KSPk _ |
-    KUIndex _, KSPk _ |
-    KUIndex _, KIndex _ -> Gt
+  | KIndexFieldKey l,
+    KIndexFieldKey r -> v_compare l r
 
-  | KCPk _, KField _ |
-    KCPk _, KIndexField _ |
-    KCPk _, KIndexFieldValue _ |
-    KCPk _, KIndexFieldKey _ |
-    KCPk _, KUIndexField _ |
-    KCPk _, KUIndexFieldValue _ -> Lt
+  | KUIndexFieldValue l,
+    KUIndexFieldValue r -> v_compare l r
 
-  | KField _, KCPk _ |
-    KIndexField _, KCPk _ |
-    KIndexFieldValue _, KCPk _ |
-    KIndexFieldKey _, KCPk _ |
-    KUIndexField _, KCPk _ |
-    KUIndexFieldValue _, KCPk _ -> Lt
+  | KSPk _, KIndex _
+  | KSPk _, KUIndex _
+  | KIndex _, KUIndex _ -> Lt
+
+  | KIndex _, KSPk _
+  | KUIndex _, KSPk _
+  | KUIndex _, KIndex _ -> Gt
+
+  | KCPk _, KField _
+  | KCPk _, KIndexField _
+  | KCPk _, KIndexFieldValue _
+  | KCPk _, KIndexFieldKey _
+  | KCPk _, KUIndexField _
+  | KCPk _, KUIndexFieldValue _ -> Lt
+
+  | KField _, KCPk _
+  | KIndexField _, KCPk _
+  | KIndexFieldValue _, KCPk _
+  | KIndexFieldKey _, KCPk _
+  | KUIndexField _, KCPk _
+  | KUIndexFieldValue _, KCPk _ -> Lt
 
   | Bottom, _ -> Lt
   | _, Bottom -> Gt
@@ -244,20 +259,43 @@ let prev_key_opt elt t = match Storage.split elt !t with
 let prev_key elt t = Js.Undefined.from_opt @@ prev_key_opt elt t
 
 let is_same_level = function
-  (* Two table keys (metadata) *)
-  | KTable (_, Bottom), KTable (_, Bottom)
-  (* Two pk keys (sentinel) *)
-  | KTable (_, KSPk (_, Bottom)), KTable (_, KSPk (_, Bottom))
-  (* Two complex pk keys (sentinel) *)
-  | KTable (_, KCPk (_, Bottom)), KTable (_, KCPk (_, Bottom))
-  (* Two field keys (actual data) *)
-  | KTable (_, KSPk (_, KField _)), KTable (_, KSPk (_, KField _))
-  (* Two field keys with complex key (actual data) *)
-  | KTable (_, KCPk (_, KField _)), KTable (_, KCPk (_, KField _))
-  (* Two index field keys (just placeholder key that includes the data) *)
-  | KTable (_, KIndex (_, KIndexField (_, KIndexFieldValue (_, KIndexFieldKey _)))), KTable (_, KIndex (_, KIndexField (_, KIndexFieldValue (_, KIndexFieldKey _))))
-  (* Two unique index field keys (points to the sentinel key of the row) *)
-  | KTable (_, KUIndex (_, KUIndexField (_, KUIndexFieldValue _))), KTable (_, KUIndex (_, KUIndexField (_, KUIndexFieldValue _))) -> true
+
+  | KTable (_, Bottom),
+    KTable (_, Bottom)
+
+  | KTable (_, KSPk (_, Bottom)),
+    KTable (_, KSPk (_, Bottom))
+
+  | KTable (_, KCPk (_, Bottom)),
+    KTable (_, KCPk (_, Bottom))
+
+  | KTable (_, KSPk (_, KField _)),
+    KTable (_, KSPk (_, KField _))
+
+  | KTable (_, KCPk (_, KField _)),
+    KTable (_, KCPk (_, KField _))
+
+  | KTable (_, KIndex (_, Bottom)),
+    KTable (_, KIndex (_, Bottom))
+
+  | KTable (_, KIndex (_, KIndexField (_, Bottom))),
+    KTable (_, KIndex (_, KIndexField (_, Bottom)))
+
+  | KTable (_, KIndex (_, KIndexField (_, KIndexFieldValue (_, Bottom)))),
+    KTable (_, KIndex (_, KIndexField (_, KIndexFieldValue (_, Bottom))))
+
+  | KTable (_, KIndex (_, KIndexField (_, KIndexFieldValue (_, KIndexFieldKey _)))),
+    KTable (_, KIndex (_, KIndexField (_, KIndexFieldValue (_, KIndexFieldKey _))))
+
+  | KTable (_, KUIndex (_, Bottom)),
+    KTable (_, KUIndex (_, Bottom))
+
+  | KTable (_, KUIndex (_, KUIndexField (_, Bottom))),
+    KTable (_, KUIndex (_, KUIndexField (_, Bottom)))
+
+  | KTable (_, KUIndex (_, KUIndexField (_, KUIndexFieldValue _))),
+    KTable (_, KUIndex (_, KUIndexField (_, KUIndexFieldValue _))) -> true
+
   | _, _ -> false
 
 let is_subkey l r = match key_compare l r with
