@@ -1,4 +1,8 @@
 {
+    "name": "kset",
+    "version": "0.1.0",
+    "description": "Key-set implementation for antidote-sql",
+    "main": "lib/js/src/kset.js",
     "dependencies": {
         "bs-platform": "1.4.2"
     },
