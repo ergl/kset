@@ -1,7 +1,6 @@
 type t = string
 
-let d_string x =
-  B64.encode x
+let d_string x = (*B64.encode*) x
 
 let d_float fl =
   let open Nativeint in
