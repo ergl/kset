@@ -69,3 +69,5 @@ val prev_key : key -> t -> key Js.Undefined.t
 val subkeys : key -> t -> key list
 
 val batch : key -> key -> t -> key list
+
+val contents : t -> key list

@@ -329,3 +329,5 @@ let vbatch ini fin =
 let batch ini fin = match valid_range ini fin with
   | false -> invalid_arg "Kset.batch"
   | true -> vbatch ini fin
+
+let contents t = Storage.elements !t
