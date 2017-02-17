@@ -1,0 +1,27 @@
+# OASIS_START
+# DO NOT EDIT (digest: bfc01f6e9cf65a1150556c2159359916)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+true: annot, bin_annot
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library kset
+"src/kset.cmxs": use_kset
+<src/*.ml{,i,y}>: package(ppx_deriving.show)
+# Executable kset_test
+"test/kset_test.byte": package(ppx_deriving.show)
+"test/kset_test.byte": package(qcheck)
+"test/kset_test.byte": use_kset
+<test/*.ml{,i,y}>: package(ppx_deriving.show)
+<test/*.ml{,i,y}>: package(qcheck)
+<test/*.ml{,i,y}>: use_kset
+# OASIS_STOP

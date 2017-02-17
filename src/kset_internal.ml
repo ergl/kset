@@ -2,6 +2,7 @@ type data =
   | I of Int32.t
   | F of Nativeint.t
   | S of string
+[@@deriving show]
 
 let d_int x = I x
 let d_float f = F f
@@ -62,6 +63,7 @@ type key =
      embedded into the key structure. Points to its corresponding primary key.
      A conditional put must be used to check for uniqueness. *)
   | KUIndexFieldValue of data
+[@@deriving show]
 
 type key_type =
   | Table
@@ -298,7 +300,7 @@ let find_opt x t = wrap @@ fun () -> Storage.find x t
 
 let find x t =
   let cont, _ = !t in
-  Js.Undefined.from_opt @@ find_opt x cont
+  find_opt x cont
 
 let remove k t =
   let cont, _ = !t in
@@ -319,7 +321,7 @@ let next_key_opt elt t = match Storage.split elt t with
 
 let next_key elt t =
   let cont, _ = !t in
-  Js.Undefined.from_opt @@ next_key_opt elt cont
+  next_key_opt elt cont
 
 let prev_key_opt elt t = match Storage.split elt t with
   | (_, false, _) -> None
@@ -327,7 +329,7 @@ let prev_key_opt elt t = match Storage.split elt t with
 
 let prev_key elt t =
   let cont, _ = !t in
-  Js.Undefined.from_opt @@ prev_key_opt elt cont
+  prev_key_opt elt cont
 
 let is_same_level = function
 

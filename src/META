@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 9ee01171fb159f5370b2f77cd9c66749)
+version = "0.1.0"
+description = "Key-set implementation for antidote-sql"
+requires = "ppx_deriving.show"
+archive(byte) = "kset.cma"
+archive(byte, plugin) = "kset.cma"
+archive(native) = "kset.cmxa"
+archive(native, plugin) = "kset.cmxs"
+exists_if = "kset.cma"
+# OASIS_STOP
+

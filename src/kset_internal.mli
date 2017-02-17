@@ -1,4 +1,6 @@
 type key
+[@@deriving show]
+
 type data
 
 val d_int : Int32.t -> data
@@ -94,7 +96,8 @@ val changed : t -> bool
 val reset : t -> unit
 
 val add : key -> t -> unit
-val find : key -> t -> key Js.Undefined.t
+
+val find : key -> t -> key option
 
 (* [swap k k' t] will swap key [k] for [k'] in [t], if it exists.
    If [k] is not an element of [t], nothing will happen. *)
@@ -104,11 +107,11 @@ val remove : key -> t -> unit
 
 (* [next_key k t] will return the next key in the kset,
    or undefined if k is the last key. *)
-val next_key : key -> t -> key Js.Undefined.t
+val next_key : key -> t -> key option
 
 (* [next_key k t] will return the previous key in the kset,
    or undefined if k is the first key. *)
-val prev_key : key -> t -> key Js.Undefined.t
+val prev_key : key -> t -> key option
 
 (* [subkeys k t] will return a list of all the keys that are
    subkeys of [k]. [k] itself is not included in the result. *)
