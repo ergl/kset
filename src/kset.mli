@@ -58,7 +58,7 @@ val repr : key -> string
 
 type t
 
-val empty : t
+val empty : unit -> t
 
 val add : key -> t -> unit
 val find : key -> t -> key Js.Undefined.t

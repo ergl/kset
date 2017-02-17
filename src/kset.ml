@@ -236,7 +236,7 @@ module Storage = Set.Make (struct
 
 type t = Storage.t ref
 
-let empty = ref Storage.empty
+let empty () = ref Storage.empty
 
 let wrap fn = try Some (fn ()) with Not_found -> None
 
