@@ -67,3 +67,5 @@ let storage_generator =
        List.iter (fun k -> Kset.add k set) key_list;
        set)
     (Gen.list key_generator)
+
+let arbitrary_storage = make storage_generator
