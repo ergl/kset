@@ -10,7 +10,7 @@ let member_test =
 
 let no_member_test =
   let open QCheck in
-  Test.make ~name: "Kset.find will always return None for non-added keys" ~count: 10
+  Test.make ~name: "Kset.find will always return None for non-added keys" ~count: 1000
     Models.arbitrary_key (
     fun key ->
       let set = Kset.empty () in
