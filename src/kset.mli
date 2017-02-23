@@ -41,6 +41,8 @@ val index_key : tname:string
   -> fkey:data
   -> key
 
+val raw_uindex : tname:string -> iname:string -> key
+
 (* Create a raw index field name key. Used only for batches and subkeys *)
 val raw_uindex_field : tname:string
   -> iname:string
