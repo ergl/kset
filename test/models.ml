@@ -4,8 +4,7 @@ let gen_str = Gen.small_string ~gen:Gen.printable
 and gen_ui32 = Gen.ui32
 and gen_nat = Gen.nat
 
-let table_keys =
-  [ Gen.map (fun x -> Kset.table x) gen_str]
+let table_keys = Gen.map (fun x -> Kset.table x) gen_str
 
 let primary_keys =
   [ Gen.map
@@ -49,13 +48,13 @@ let uindex_keys =
       Gen.(quad gen_str gen_str gen_str gen_ui32)
   ]
 
-let key_generator = Gen.oneof
-    ( table_keys
-      @ primary_keys
-      @ field_keys
-      @ index_keys
-      @ uindex_keys
-    )
+let key_generator = Gen.frequency
+    [ (1, table_keys)
+    ; (2, Gen.oneof primary_keys)
+    ; (4, Gen.oneof field_keys)
+    ; (2, Gen.oneof index_keys)
+    ; (2, Gen.oneof uindex_keys)
+    ]
 
 let key_printer = Kset.show_key
 let arbitrary_key = make ~print:key_printer key_generator
