@@ -93,12 +93,27 @@ let next_key_test =
       Kset.next_key elt st = Some (List.nth key_h @@ n + 1)
   )
 
-let _ =
-  QCheck_runner.run_tests_main [
+let batch_test =
+  let open QCheck in
+  Test.make
+    ~name: "Batch on hierarchies returns the entire hierarchy"
+    ~count: 1000
+    Models.arbitrary_key_hierarchy (
+    fun key_h ->
+      let st = Kset.empty () in
+      let first, last =
+        List.hd key_h, List.nth key_h @@ List.length key_h - 1
+      in
+      List.iter (fun k -> Kset.add k st) key_h;
+      Kset.batch first last st = key_h
+  )
+
+let _ = QCheck_runner.run_tests_main [
     positive_find_test
   ; negative_member_test
   ; subkeys_bare_test
   ; subkeys_subset_test
   ; prev_key_test
   ; next_key_test
+  ; batch_test
   ]
