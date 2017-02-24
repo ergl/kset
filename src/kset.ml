@@ -298,9 +298,16 @@ let is_same_level = function
 
   | _, _ -> false
 
+let get_root = function
+  | KTable (t, _) -> KTable (t, Bottom)
+  | _ -> invalid_arg "extract_root"
+
 let is_subkey l r = match key_compare l r with
   | Eq | Gt -> false
-  | Lt -> not @@ is_same_level (l, r)
+  | Lt -> begin
+      not (is_same_level (l, r))
+      && (get_root l) = (get_root r)
+    end
 
 let valid_range l r = match key_compare l r with
   | Gt -> false
