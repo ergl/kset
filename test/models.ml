@@ -84,12 +84,11 @@ let uindex_hierarchy =
     ; Kset.uindex_key t i f (Kset.d_string fv)
     ]) Gen.(quad gen_str gen_str gen_str gen_str)
 
-let hierarchy_generator = Gen.oneof
-    ( table_hierarchy
-      :: index_hierarchy
-      :: uindex_hierarchy
-      :: []
-    )
+let hierarchy_generator = Gen.frequency
+    [ (1, table_hierarchy)
+    ; (2, index_hierarchy)
+    ; (2, uindex_hierarchy)
+    ]
 
 let key_h_printer l = List.fold_left (^) ""  @@ List.map Kset.show_key l
 let arbitrary_key_hierarchy = make
