@@ -3,6 +3,8 @@ let member_test =
   Test.make
     ~name: "Kset.find will always return Some k for added keys k"
     ~count: 1000
+    (pair Models.arbitrary_key Models.arbitrary_storage) (
+    fun (key, set) ->
       Kset.add key set;
       Kset.find key set = Some key
   )

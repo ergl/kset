@@ -68,4 +68,9 @@ let storage_generator =
        set)
     (Gen.list key_generator)
 
-let arbitrary_storage = make storage_generator
+let storage_printer t = Kset.contents t |> key_h_printer
+
+let arbitrary_storage = make
+    ~print:storage_printer
+    ~small: (fun t -> Kset.contents t |> List.length)
+    storage_generator
