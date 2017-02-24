@@ -60,6 +60,43 @@ let key_generator = Gen.oneof
 let key_printer = Kset.show_key
 let arbitrary_key = make ~print:key_printer key_generator
 
+let table_hierarchy =
+  Gen.map (fun (t,k,f) ->
+    [ Kset.table t
+    ; Kset.spk t (Kset.d_int k)
+    ; Kset.field t (Kset.d_int k) f
+    ]) Gen.(triple gen_str gen_ui32 gen_str)
+
+let index_hierarchy =
+  Gen.map (fun ((t,i,f,fv),fk) ->
+    [ Kset.table t
+    ; Kset.raw_index t i
+    ; Kset.raw_index_field t i f
+    ; Kset.raw_index_field_value t i f (Kset.d_string fv)
+    ; Kset.index_key t i f (Kset.d_string fv) (Kset.d_int fk)
+    ]) Gen.(pair (quad gen_str gen_str gen_str gen_str) gen_ui32)
+
+let uindex_hierarchy =
+  Gen.map (fun (t,i,f,fv) ->
+    [ Kset.table t
+    ; Kset.raw_uindex t i
+    ; Kset.raw_uindex_field t i f
+    ; Kset.uindex_key t i f (Kset.d_string fv)
+    ]) Gen.(quad gen_str gen_str gen_str gen_str)
+
+let hierarchy_generator = Gen.oneof
+    ( table_hierarchy
+      :: index_hierarchy
+      :: uindex_hierarchy
+      :: []
+    )
+
+let key_h_printer l = List.fold_left (^) ""  @@ List.map Kset.show_key l
+let arbitrary_key_hierarchy = make
+    ~print:key_h_printer
+    ~small: (List.length)
+    hierarchy_generator
+
 let storage_generator =
   Gen.map
     (fun key_list ->
