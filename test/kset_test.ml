@@ -1,16 +1,17 @@
 let member_test =
   let open QCheck in
-  Test.make ~name: "Kset.find will always return Some k for added keys k" ~count: 1000
-    Models.arbitrary_key (
-    fun key ->
-      let set = Kset.empty () in
+  Test.make
+    ~name: "Kset.find will always return Some k for added keys k"
+    ~count: 1000
       Kset.add key set;
       Kset.find key set = Some key
   )
 
 let no_member_test =
   let open QCheck in
-  Test.make ~name: "Kset.find will always return None for non-added keys" ~count: 1000
+  Test.make
+    ~name: "Kset.find will always return None for non-added keys"
+    ~count: 1000
     Models.arbitrary_key (
     fun key ->
       let set = Kset.empty () in
