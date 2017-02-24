@@ -1,4 +1,4 @@
-let member_test =
+let positive_find_test =
   let open QCheck in
   Test.make
     ~name: "Kset.find will always return Some k for added keys k"
@@ -9,7 +9,7 @@ let member_test =
       Kset.find key set = Some key
   )
 
-let no_member_test =
+let negative_member_test =
   let open QCheck in
   Test.make
     ~name: "Kset.find will always return None for non-added keys"
@@ -31,7 +31,7 @@ let split_at_nth n l =
   let a,b = split [] 0 l in
   (List.rev a, b)
 
-let hierarchy_test =
+let subkeys_bare_test =
   let open QCheck in
   Test.make
     ~name: "For empty sets, Kset.subkeys will always return the entire hierarchy"
@@ -45,7 +45,7 @@ let hierarchy_test =
       Kset.subkeys (List.hd tail) st = tail
   )
 
-let random_hierarchy_test =
+let subkeys_subset_test =
   let open QCheck in
   Test.make
     ~name: "For random sets, Kset.subkeys will always return a superset of the original hierarchy"
@@ -61,8 +61,8 @@ let random_hierarchy_test =
 
 let _ =
   QCheck_runner.run_tests_main [
-    member_test
-  ; no_member_test
-  ; hierarchy_test
-  ; random_hierarchy_test
+    positive_find_test
+  ; negative_member_test
+  ; subkeys_bare_test
+  ; subkeys_subset_test
   ]
