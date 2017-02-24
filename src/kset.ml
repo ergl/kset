@@ -329,12 +329,12 @@ let subkeys ini t =
   let still_subkey = is_subkey ini in
   collect_while ini still_subkey t
 
-let vbatch ini fin =
+let vbatch ini fin t =
   let in_range a = valid_range a fin in
-  collect_while ini in_range
+  collect_while ini in_range t
 
-let batch ini fin = match valid_range ini fin with
+let batch ini fin t = match valid_range ini fin with
   | false -> invalid_arg "Kset.batch"
-  | true -> vbatch ini fin
+  | true -> vbatch ini fin t
 
 let contents t = Storage.elements !t
