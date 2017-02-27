@@ -150,6 +150,19 @@ let repr k = repr' k []
              |> List.rev
              |> concat
 
+let is_data = function
+  | KTable (_, KSPk (_, _))
+  | KTable (_, KCPk (_, _)) -> true
+  | _ -> false
+
+let is_index = function
+  | KTable (_, KIndex (_, _)) -> true
+  | _ -> false
+
+let is_uindex = function
+  | KTable (_, KUIndex (_, _)) -> true
+  | _ -> false
+
 type com_range = | Eq 
                  | Lt
                  | Gt

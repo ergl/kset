@@ -58,6 +58,10 @@ val uindex_key : tname:string
 
 val repr : key -> string
 
+val is_data : key -> bool
+val is_index : key -> bool
+val is_uindex : key -> bool
+
 type t
 
 val empty : unit -> t
