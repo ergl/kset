@@ -163,6 +163,15 @@ let is_uindex = function
   | KTable (_, KUIndex (_, _)) -> true
   | _ -> false
 
+let field_from_key_opt = function
+  | KTable (_, KSPk (_, KField a))
+  | KTable (_, KCPk (_, KField a)) -> Some a
+  | _ -> None
+
+let field_from_key k =
+  field_from_key_opt k
+  |> Js.Undefined.from_opt
+
 type com_range = | Eq 
                  | Lt
                  | Gt

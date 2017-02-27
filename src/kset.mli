@@ -62,6 +62,8 @@ val is_data : key -> bool
 val is_index : key -> bool
 val is_uindex : key -> bool
 
+val field_from_key : key -> string Js.Undefined.t
+
 type t
 
 val empty : unit -> t
