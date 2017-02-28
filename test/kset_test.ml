@@ -31,6 +31,31 @@ let split_at_nth n l =
   let a,b = split [] 0 l in
   (List.rev a, b)
 
+let subkey_identity_test =
+  let open QCheck in
+  Test.make
+    ~name: "Subkeys on singleton sets return the empty list"
+    ~count: 1000
+    Models.arbitrary_key (
+    fun key ->
+      let st = Kset.empty () in
+      Kset.add key st;
+      Kset.subkeys key st = []
+  )
+
+let subkey_exclusive_test =
+  let open QCheck in
+  Test.make
+    ~name: "Subkeys result should not contain the caller key"
+    ~count: 1000
+    (pair Models.arbitrary_key_hierarchy Models.arbitrary_storage) (
+    fun (key_h, st) ->
+      let first = List.hd key_h in
+      List.iter (fun k -> Kset.add k st) key_h;
+      let subkeys = Kset.subkeys first st in
+      not @@ List.mem first subkeys
+  )
+
 let subkeys_bare_test =
   let open QCheck in
   Test.make
@@ -38,11 +63,15 @@ let subkeys_bare_test =
     ~count: 1000
     Models.arbitrary_key_hierarchy (
     fun key_h ->
+      let n =
+        Random.self_init ();
+        Random.int (List.length key_h)
+      in
       let st = Kset.empty () in
-      let n = Random.self_init (); Random.int (List.length key_h) in
-      let (head, tail) = split_at_nth n key_h in
-      let _ = List.iter (fun k -> Kset.add k st) key_h in
-      Kset.subkeys (List.hd tail) st = tail
+      let _, range = split_at_nth n key_h in
+      let head, tail = List.hd range, List.tl range in
+      List.iter (fun k -> Kset.add k st) key_h;
+      Kset.subkeys head st = tail
   )
 
 let subkeys_subset_test =
@@ -52,11 +81,15 @@ let subkeys_subset_test =
     ~count: 1000
     (pair Models.arbitrary_key_hierarchy Models.arbitrary_storage) (
     fun (key_h, st) ->
-      let n = Random.self_init (); Random.int (List.length key_h) in
-      let (head, tail) = split_at_nth n key_h in
-      let _ = List.iter (fun k -> Kset.add k st) key_h in
-      let all_subkeys = Kset.subkeys (List.hd tail) st in
-      List.for_all (fun k -> List.mem k all_subkeys) tail
+      let n =
+        Random.self_init ();
+        Random.int (List.length key_h)
+      in
+      let _, range = split_at_nth n key_h in
+      let head, tail = List.hd range, List.tl range in
+      List.iter (fun k -> Kset.add k st) key_h;
+      let subkeys = Kset.subkeys head st in
+      List.for_all (fun k -> List.mem k subkeys) tail
   )
 
 let prev_key_test =
@@ -112,7 +145,7 @@ let batch_range_test =
   let open QCheck in
   Test.make
     ~name: "Batch on identity ranges should return only one key"
-    ~count: 100
+    ~count: 1000
     Models.arbitrary_key (
     fun key ->
       let st = Kset.empty () in
@@ -123,6 +156,8 @@ let batch_range_test =
 let _ = QCheck_runner.run_tests_main [
     positive_find_test
   ; negative_member_test
+  ; subkey_identity_test
+  ; subkey_exclusive_test
   ; subkeys_bare_test
   ; subkeys_subset_test
   ; prev_key_test
