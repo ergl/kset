@@ -347,9 +347,12 @@ let collect_while ini fn t =
   | None -> []
   | Some s -> List.rev @@ collect [s] (next_key_opt s t)
 
-let subkeys ini t =
-  let still_subkey = is_subkey ini in
-  collect_while ini still_subkey t
+let subkeys ini t = match next_key_opt ini t with
+  | None -> []
+  | Some s -> begin
+      let still_subkey = is_subkey ini in
+      collect_while s still_subkey t
+    end
 
 let vbatch ini fin t =
   let in_range a = valid_range a fin in
