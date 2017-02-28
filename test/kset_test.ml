@@ -108,6 +108,18 @@ let batch_test =
       Kset.batch first last st = key_h
   )
 
+let batch_range_test =
+  let open QCheck in
+  Test.make
+    ~name: "Batch on identity ranges should return only one key"
+    ~count: 100
+    Models.arbitrary_key (
+    fun key ->
+      let st = Kset.empty () in
+      Kset.add key st;
+      Kset.batch key key st = [key]
+  )
+
 let _ = QCheck_runner.run_tests_main [
     positive_find_test
   ; negative_member_test
@@ -116,4 +128,5 @@ let _ = QCheck_runner.run_tests_main [
   ; prev_key_test
   ; next_key_test
   ; batch_test
+  ; batch_range_test
   ]
