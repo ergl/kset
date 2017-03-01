@@ -329,11 +329,16 @@ let get_root = function
   | KTable (t, _) -> KTable (t, Bottom)
   | _ -> invalid_arg "extract_root"
 
-let is_subkey l r = match key_compare l r with
+let is_subkey super sub = match key_compare super sub with
   | Eq | Gt -> false
   | Lt -> begin
-      not (is_same_level (l, r))
-      && (get_root l) = (get_root r)
+      let same_level = is_same_level (super, sub)
+      and same_bucket = get_root super = get_root sub
+      and same_type = key_type super = key_type sub in
+      let same_section = not same_level && same_bucket in
+      match key_type super with
+      | Table -> same_section
+      | _ -> same_section && same_type
     end
 
 let valid_range l r = match key_compare l r with
