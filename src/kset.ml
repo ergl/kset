@@ -63,6 +63,12 @@ type key =
      A conditional put must be used to check for uniqueness. *)
   | KUIndexFieldValue of data
 
+type key_type =
+  | Table
+  | Data
+  | Index
+  | UIndex
+
 let table ~tname:t =
   KTable (t, Bottom)
 
@@ -95,6 +101,14 @@ let raw_uindex_field ~tname:t ~iname:i ~fname:f =
 
 let uindex_key ~tname:t ~iname:i ~fname:f ~fvalue:v =
   KTable (t, KUIndex (i, KUIndexField (f, KUIndexFieldValue v)))
+
+let key_type = function
+  | KTable (_, Bottom) -> Table
+  | KTable (_, KSPk (_, _))
+  | KTable (_, KCPk (_, _)) -> Data
+  | KTable (_, KIndex (_, _)) -> Index
+  | KTable (_, KUIndex (_, _)) -> UIndex
+  | _ -> invalid_arg "key_type"
 
 let prefix_separator = '%'
 let prefix_separator_str = Char.escaped prefix_separator
@@ -150,18 +164,9 @@ let repr k = repr' k []
              |> List.rev
              |> concat
 
-let is_data = function
-  | KTable (_, KSPk (_, _))
-  | KTable (_, KCPk (_, _)) -> true
-  | _ -> false
-
-let is_index = function
-  | KTable (_, KIndex (_, _)) -> true
-  | _ -> false
-
-let is_uindex = function
-  | KTable (_, KUIndex (_, _)) -> true
-  | _ -> false
+let is_data k = key_type k = Data
+let is_index k = key_type k = Index
+let is_uindex k = key_type k = UIndex
 
 let field_from_key_opt = function
   | KTable (_, KSPk (_, KField a))
