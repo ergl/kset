@@ -56,6 +56,30 @@ let subkey_exclusive_test =
       not @@ List.mem first subkeys
   )
 
+let subkey_bucket_test =
+  let open QCheck in
+  Test.make
+    ~name: "Subkeys shouldn't cross key buckets"
+    ~count: 1000
+    Models.arbitrary_key_hierarchy (
+    fun key_h ->
+      let n =
+        Random.self_init ();
+        Random.int (List.length key_h - 1)
+      in
+      let _, (hd::tl as range) = split_at_nth n key_h in
+      let st = Kset.empty () in
+      List.iter (fun k -> Kset.add k st) range;
+      let subkeys = Kset.subkeys hd st in
+      if Kset.is_data hd then
+        List.for_all Kset.is_data subkeys
+      else if Kset.is_index hd then
+        List.for_all Kset.is_index subkeys
+      else if Kset.is_uindex hd then
+        List.for_all Kset.is_uindex subkeys
+      else subkeys = tl
+  )
+
 let subkeys_bare_test =
   let open QCheck in
   Test.make
@@ -148,6 +172,7 @@ let _ = QCheck_runner.run_tests_main [
   ; negative_member_test
   ; subkey_identity_test
   ; subkey_exclusive_test
+  ; subkey_bucket_test
   ; subkeys_bare_test
   ; subkeys_subset_test
   ; prev_key_test
