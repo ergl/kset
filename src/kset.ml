@@ -63,6 +63,12 @@ type key =
      A conditional put must be used to check for uniqueness. *)
   | KUIndexFieldValue of data
 
+type key_type =
+  | Table
+  | Data
+  | Index
+  | UIndex
+
 let table ~tname:t =
   KTable (t, Bottom)
 
@@ -95,6 +101,14 @@ let raw_uindex_field ~tname:t ~iname:i ~fname:f =
 
 let uindex_key ~tname:t ~iname:i ~fname:f ~fvalue:v =
   KTable (t, KUIndex (i, KUIndexField (f, KUIndexFieldValue v)))
+
+let key_type = function
+  | KTable (_, Bottom) -> Table
+  | KTable (_, KSPk (_, _))
+  | KTable (_, KCPk (_, _)) -> Data
+  | KTable (_, KIndex (_, _)) -> Index
+  | KTable (_, KUIndex (_, _)) -> UIndex
+  | _ -> invalid_arg "key_type"
 
 let prefix_separator = '%'
 let prefix_separator_str = Char.escaped prefix_separator
@@ -149,6 +163,19 @@ let rec repr' (key : key) (acc : string list) : string list = match key with
 let repr k = repr' k []
              |> List.rev
              |> concat
+
+let is_data k = key_type k = Data
+let is_index k = key_type k = Index
+let is_uindex k = key_type k = UIndex
+
+let field_from_key_opt = function
+  | KTable (_, KSPk (_, KField a))
+  | KTable (_, KCPk (_, KField a)) -> Some a
+  | _ -> None
+
+let field_from_key k =
+  field_from_key_opt k
+  |> Js.Undefined.from_opt
 
 type com_range = | Eq 
                  | Lt
@@ -302,11 +329,16 @@ let get_root = function
   | KTable (t, _) -> KTable (t, Bottom)
   | _ -> invalid_arg "extract_root"
 
-let is_subkey l r = match key_compare l r with
+let is_subkey super sub = match key_compare super sub with
   | Eq | Gt -> false
   | Lt -> begin
-      not (is_same_level (l, r))
-      && (get_root l) = (get_root r)
+      let same_level = is_same_level (super, sub)
+      and same_bucket = get_root super = get_root sub
+      and same_type = key_type super = key_type sub in
+      let same_section = not same_level && same_bucket in
+      match key_type super with
+      | Table -> same_section
+      | _ -> same_section && same_type
     end
 
 let valid_range l r = match key_compare l r with
@@ -325,9 +357,12 @@ let collect_while ini fn t =
   | None -> []
   | Some s -> List.rev @@ collect [s] (next_key_opt s t)
 
-let subkeys ini t =
-  let still_subkey = is_subkey ini in
-  collect_while ini still_subkey t
+let subkeys ini t = match next_key_opt ini t with
+  | None -> []
+  | Some s -> begin
+      let still_subkey = is_subkey ini in
+      collect_while s still_subkey t
+    end
 
 let vbatch ini fin t =
   let in_range a = valid_range a fin in
