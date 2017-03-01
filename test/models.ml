@@ -83,10 +83,27 @@ let uindex_hierarchy =
     ; Kset.uindex_key t i f (Kset.d_string fv)
     ]) Gen.(quad gen_str gen_str gen_str gen_str)
 
+let mixed_hierarchy =
+  Gen.map (fun ((t,i,f,fv),fk) ->
+    [ Kset.table t
+    ; Kset.spk t (Kset.d_int fk)
+    ; Kset.field t (Kset.d_int fk) f
+
+    ; Kset.raw_index t i
+    ; Kset.raw_index_field t i f
+    ; Kset.raw_index_field_value t i f (Kset.d_string fv)
+    ; Kset.index_key t i f (Kset.d_string fv) (Kset.d_int fk)
+
+    ; Kset.raw_uindex t i
+    ; Kset.raw_uindex_field t i f
+    ; Kset.uindex_key t i f (Kset.d_string fv)
+    ]) Gen.(pair (quad gen_str gen_str gen_str gen_str) gen_ui32)
+
 let hierarchy_generator = Gen.frequency
     [ (1, table_hierarchy)
     ; (2, index_hierarchy)
     ; (2, uindex_hierarchy)
+    ; (4, mixed_hierarchy)
     ]
 
 let key_h_printer l = List.fold_left (^) ""  @@ List.map Kset.show_key l

@@ -63,13 +63,8 @@ let subkeys_bare_test =
     ~count: 1000
     Models.arbitrary_key_hierarchy (
     fun key_h ->
-      let n =
-        Random.self_init ();
-        Random.int (List.length key_h)
-      in
       let st = Kset.empty () in
-      let _, range = split_at_nth n key_h in
-      let head, tail = List.hd range, List.tl range in
+      let head, tail = List.hd key_h, List.tl key_h in
       List.iter (fun k -> Kset.add k st) key_h;
       Kset.subkeys head st = tail
   )
@@ -81,12 +76,7 @@ let subkeys_subset_test =
     ~count: 1000
     (pair Models.arbitrary_key_hierarchy Models.arbitrary_storage) (
     fun (key_h, st) ->
-      let n =
-        Random.self_init ();
-        Random.int (List.length key_h)
-      in
-      let _, range = split_at_nth n key_h in
-      let head, tail = List.hd range, List.tl range in
+      let head, tail = List.hd key_h, List.tl key_h in
       List.iter (fun k -> Kset.add k st) key_h;
       let subkeys = Kset.subkeys head st in
       List.for_all (fun k -> List.mem k subkeys) tail
