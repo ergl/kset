@@ -360,6 +360,8 @@ let collect_while ini fn t =
 let subkeys ini t = match next_key_opt ini t with
   | None -> []
   | Some s -> begin
+      if not @@ is_subkey ini s then []
+      else
       let still_subkey = is_subkey ini in
       collect_while s still_subkey t
     end
