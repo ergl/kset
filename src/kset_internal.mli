@@ -74,14 +74,14 @@ val is_uindex : key -> bool
 
 (* Given a leaf index key, extract the primary key. Will return undefined
    if the given key is not a leaf index. *)
-val get_index_data : key -> data Js.Undefined.t
+val get_index_data : key -> data option
 
 (* Given a key, extract the table name. *)
 val table_from_key : key -> string
 
 (* Given a leaf field key, extract the field name.
    Returns undefined if the key is not a leaf field. *)
-val field_from_key : key -> string Js.Undefined.t
+val field_from_key : key -> string option
 
 type t
 

@@ -170,7 +170,7 @@ let is_data k = key_type k = Data
 let is_index k = key_type k = Index
 let is_uindex k = key_type k = UIndex
 
-let get_index_data k = Js.Undefined.from_opt @@ match key_type k with
+let get_index_data k = match key_type k with
   | Index -> begin match k with
       | KTable (_,
           KIndex (_,
@@ -190,9 +190,7 @@ let field_from_key_opt = function
   | KTable (_, KCPk (_, KField a)) -> Some a
   | _ -> None
 
-let field_from_key k =
-  field_from_key_opt k
-  |> Js.Undefined.from_opt
+let field_from_key k = field_from_key_opt k
 
 type com_range = | Eq 
                  | Lt
