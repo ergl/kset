@@ -14,7 +14,7 @@ val spk : tname:string -> value:data -> key
 (* Create a complex sentinel key *)
 (*val cpk : tname:string -> value:data list -> key*)
 
-(* Create a fiel key *)
+(* Create a field key *)
 val field : tname:string -> value:data -> fname:string -> key
 
 (* Create a raw index key. Used only for batches and subkeys *)
