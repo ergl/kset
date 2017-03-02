@@ -168,6 +168,17 @@ let is_data k = key_type k = Data
 let is_index k = key_type k = Index
 let is_uindex k = key_type k = UIndex
 
+let get_index_data k = Js.Undefined.from_opt @@ match key_type k with
+  | Index -> begin match k with
+      | KTable (_,
+          KIndex (_,
+            KIndexField (_,
+              KIndexFieldValue (_,
+                KIndexFieldKey fk)))) -> Some fk
+      | _ -> None
+    end
+  | _ -> None
+
 let field_from_key_opt = function
   | KTable (_, KSPk (_, KField a))
   | KTable (_, KCPk (_, KField a)) -> Some a

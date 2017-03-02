@@ -70,6 +70,10 @@ val is_index : key -> bool
 (* A key that represents an unique index key or any of its subkeys. *)
 val is_uindex : key -> bool
 
+(* Given a leaf index key, extract the primary key. Will return undefined
+   if the given key is not a leaf index. *)
+val get_index_data : key -> data Js.Undefined.t
+
 (* Given a leaf field key, extract the field name.
    Returns undefined if the key is not a leaf field. *)
 val field_from_key : key -> string Js.Undefined.t
