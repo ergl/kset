@@ -56,12 +56,22 @@ val uindex_key : tname:string
   -> fvalue:data
   -> key
 
+(* A string representation of key. Used to interact with Antidote,
+   as it demands keys to be strings. *)
 val repr : key -> string
 
+(* A key that represents actual data stored in Antidote.
+   That is, primary and field keys. *)
 val is_data : key -> bool
+
+(* A key that represents an index key or any of its subkeys. *)
 val is_index : key -> bool
+
+(* A key that represents an unique index key or any of its subkeys. *)
 val is_uindex : key -> bool
 
+(* Given a leaf field key, extract the field name.
+   Returns undefined if the key is not a leaf field. *)
 val field_from_key : key -> string Js.Undefined.t
 
 type t
@@ -71,11 +81,21 @@ val empty : unit -> t
 val add : key -> t -> unit
 val find : key -> t -> key Js.Undefined.t
 
+(* [next_key k t] will return the next key in the kset,
+   or undefined if k is the last key. *)
 val next_key : key -> t -> key Js.Undefined.t
+
+(* [next_key k t] will return the previous key in the kset,
+   or undefined if k is the first key. *)
 val prev_key : key -> t -> key Js.Undefined.t
 
+(* [subkeys k t] will return a list of all the keys that are
+   subkeys of [k]. [k] itself is not included in the result. *)
 val subkeys : key -> t -> key list
 
+(* [batch k k' t] will return all the keys between k and k'.
+   Both [k] and [k'] are included in the result. *)
 val batch : key -> key -> t -> key list
 
+(* [contents t] will dump all the keys in the set. *)
 val contents : t -> key list
