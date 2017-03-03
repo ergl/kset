@@ -284,6 +284,15 @@ let find_opt x t = wrap @@ fun () -> Storage.find x !t
 
 let find x t = Js.Undefined.from_opt @@ find_opt x t
 
+let remove k t = t := Storage.remove k !t
+
+let swap k k' t = match find_opt k t with
+  | None -> ()
+  | Some s -> begin
+      remove k t;
+      add k' t
+    end
+
 let next_key_opt elt t = match Storage.split elt !t with
   | (_, false, _) -> None
   | (_, true, gt) -> wrap @@ fun () -> Storage.min_elt gt
