@@ -85,6 +85,12 @@ val empty : unit -> t
 val add : key -> t -> unit
 val find : key -> t -> key Js.Undefined.t
 
+(* [swap k k' t] will swap key [k] for [k'] in [t], if it exists.
+   If [k] is not an element of [t], nothing will happen. *)
+val swap : key -> key -> t -> unit
+
+val remove : key -> t -> unit
+
 (* [next_key k t] will return the next key in the kset,
    or undefined if k is the last key. *)
 val next_key : key -> t -> key Js.Undefined.t
