@@ -1,3 +1,29 @@
+let unchanged_test =
+  let open QCheck in
+  Test.make
+    ~name: "Kset.changed returns false for empty sets,
+    true after add, remove or swap operations,
+    and false again after a reset operation"
+    ~count: 1000
+    (pair Models.arbitrary_key Models.arbitrary_key) (
+    fun (k, k') ->
+      let st = Kset.empty () in
+      let empty_flag = Kset.changed st in
+      Kset.add k st;
+      let after_add = Kset.changed st in
+      Kset.swap k k' st;
+      let after_swap = Kset.changed st in
+      Kset.remove k' st;
+      let after_remove = Kset.changed st in
+      Kset.reset st;
+      let after_reset = Kset.changed st in
+      (not empty_flag) &&
+      after_add &&
+      after_swap &&
+      after_remove &&
+      (not after_reset)
+  )
+
 let positive_find_test =
   let open QCheck in
   Test.make
@@ -168,7 +194,8 @@ let batch_range_test =
   )
 
 let _ = QCheck_runner.run_tests_main [
-    positive_find_test
+    unchanged_test
+  ; positive_find_test
   ; negative_member_test
   ; subkey_identity_test
   ; subkey_exclusive_test
