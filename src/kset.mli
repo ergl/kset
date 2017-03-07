@@ -80,7 +80,15 @@ val field_from_key : key -> string Js.Undefined.t
 
 type t
 
+(* Create an empty key set, with the [changed] flag set to false. *)
 val empty : unit -> t
+
+(* [changed t] will return the state of the [changed] flag for [t].
+   The changed flag is set to true whenver an [add] operation is performed.*)
+val changed : t -> bool
+
+(* [reset t] will turn the [changed] flag back to [false]. *)
+val reset : t -> unit
 
 val add : key -> t -> unit
 val find : key -> t -> key Js.Undefined.t

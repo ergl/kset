@@ -272,38 +272,58 @@ module Storage = Set.Make (struct
     let compare x y = key_compare x y |> to_comp
   end)
 
-type t = Storage.t ref
+type cont = Storage.t
+type flag = bool
+type t = (cont * flag) ref
 
-let empty () = ref Storage.empty
+let empty () = ref (Storage.empty, false)
+
+let changed t = !t |> snd
+
+let reset t =
+  let cont, flag = !t in
+  t := (cont, if flag then not flag else flag)
 
 let wrap fn = try Some (fn ()) with Not_found -> None
 
-let add elt t = t := (Storage.add elt !t)
+let add elt t =
+  let cont, _ = !t in
+  t := (Storage.add elt cont, true)
 
-let find_opt x t = wrap @@ fun () -> Storage.find x !t
+let find_opt x t = wrap @@ fun () -> Storage.find x t
 
-let find x t = Js.Undefined.from_opt @@ find_opt x t
+let find x t =
+  let cont, _ = !t in
+  Js.Undefined.from_opt @@ find_opt x cont
 
-let remove k t = t := Storage.remove k !t
+let remove k t =
+  let cont, _ = !t in
+  t := (Storage.remove k cont, true)
 
-let swap k k' t = match find_opt k t with
+let swap k k' t =
+  let cont, _ = !t in
+  match find_opt k cont with
   | None -> ()
   | Some s -> begin
       remove k t;
       add k' t
     end
 
-let next_key_opt elt t = match Storage.split elt !t with
+let next_key_opt elt t = match Storage.split elt t with
   | (_, false, _) -> None
   | (_, true, gt) -> wrap @@ fun () -> Storage.min_elt gt
 
-let next_key elt t = Js.Undefined.from_opt @@ next_key_opt elt t
+let next_key elt t =
+  let cont, _ = !t in
+  Js.Undefined.from_opt @@ next_key_opt elt cont
 
-let prev_key_opt elt t = match Storage.split elt !t with
+let prev_key_opt elt t = match Storage.split elt t with
   | (_, false, _) -> None
   | (lt, true, _) -> wrap @@ fun () -> Storage.max_elt lt
 
-let prev_key elt t = Js.Undefined.from_opt @@ prev_key_opt elt t
+let prev_key elt t =
+  let cont, _ = !t in
+  Js.Undefined.from_opt @@ prev_key_opt elt cont
 
 let is_same_level = function
 
@@ -377,21 +397,25 @@ let collect_while ini fn t =
   | None -> []
   | Some s -> List.rev @@ collect [s] (next_key_opt s t)
 
-let subkeys ini t = match next_key_opt ini t with
+let subkeys ini t =
+  let cont, _ = !t in
+  match next_key_opt ini cont with
   | None -> []
   | Some s -> begin
       if not @@ is_subkey ini s then []
       else
       let still_subkey = is_subkey ini in
-      collect_while s still_subkey t
+      collect_while s still_subkey cont
     end
 
 let vbatch ini fin t =
   let in_range a = valid_range a fin in
   collect_while ini in_range t
 
-let batch ini fin t = match valid_range ini fin with
+let batch ini fin t =
+  let cont, _ = !t in
+  match valid_range ini fin with
   | false -> invalid_arg "Kset.batch"
-  | true -> vbatch ini fin t
+  | true -> vbatch ini fin cont
 
-let contents t = Storage.elements !t
+let contents t = Storage.elements (fst !t)
