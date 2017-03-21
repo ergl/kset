@@ -179,6 +179,10 @@ let get_index_data k = Js.Undefined.from_opt @@ match key_type k with
     end
   | _ -> None
 
+let table_from_key = function
+  | KTable (t, _) -> t
+  | _ -> invalid_arg "table_from_key"
+
 let field_from_key_opt = function
   | KTable (_, KSPk (_, KField a))
   | KTable (_, KCPk (_, KField a)) -> Some a
