@@ -1,3 +1,15 @@
+(* TODO: Improve this test *)
+let get_table =
+  let open QCheck in
+  Test.make
+    ~name: "Kset.table_from_key always returns the table string
+    from a valid key"
+    ~count: 1000
+    (make (Gen.small_string ~gen:Gen.printable)) (
+    fun str ->
+      Kset.table_from_key (Kset.table str) = str
+  )
+
 let unchanged_test =
   let open QCheck in
   Test.make
@@ -194,7 +206,8 @@ let batch_range_test =
   )
 
 let _ = QCheck_runner.run_tests_main [
-    unchanged_test
+    get_table
+  ; unchanged_test
   ; positive_find_test
   ; negative_member_test
   ; subkey_identity_test
