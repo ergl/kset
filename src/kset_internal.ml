@@ -263,7 +263,7 @@ let rec key_compare left right = match left, right with
   | Bottom, _ -> Lt
   | _, Bottom -> Gt
 
-  | _, _ -> failwith "Wrong pair"
+  | _, _ -> failwith "key_compare: wrong pair"
 
 and compare_same_level : type a. (a * key) -> (a * key) -> com_range =
   fun (l, lch) (r, rch) ->
@@ -419,7 +419,7 @@ let vbatch ini fin t =
 let batch ini fin t =
   let cont, _ = !t in
   match valid_range ini fin with
-  | false -> invalid_arg "Kset.batch"
+  | false -> invalid_arg "batch"
   | true -> vbatch ini fin cont
 
 let contents t = Storage.elements (fst !t)
