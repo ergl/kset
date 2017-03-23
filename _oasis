@@ -14,7 +14,7 @@ Library "kset"
   Path: src/
   InternalModules: B64, Encoding
   BuildDepends: ppx_deriving.show
-  Modules: Kset
+  Modules: Kset_internal
 
 Executable "kset_test"
   Path: test/
